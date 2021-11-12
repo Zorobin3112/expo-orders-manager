@@ -1,9 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit"
+import * as Clipboard from 'expo-clipboard';
 import {    getDateNow, 
-            updateStatus, 
             resetAllProdSelect,
             removeItemByIndex   } from "./ultility"
-import {createNewEmptyOrder, createNewEmptyProd} from "./template"
+import {createNewEmptyOrder, createNewEmptyProd, createNewData} from "./template"
 
 export const orderSlice = createSlice({
     name: 'store',
@@ -16,6 +16,7 @@ export const orderSlice = createSlice({
         orders: []
     },
     reducers: {
+        loadData: (state, action) => action.payload,
         createOrder: ({statsList, orders}) => {
             orders.push(createNewEmptyOrder())
             const newOrderIndex = orders.length - 1
@@ -131,15 +132,23 @@ export const orderSlice = createSlice({
             if(statsList.select.length !== 0) {
                 statsList.select.forEach(orderIndex => {
                     const order = orders[orderIndex]
-                    if(order.stats.select.length === order.prods.length)
+                    if(order.stats.select.length === order.prods.length) {
                         orderRemoveIndexList.push(orderIndex)
+                    }
                     else {
                         removeItemByIndex(order.prods, order.stats.select)
                         order.stats.select = []
+
                     }
                 })
                 removeItemByIndex(orders, orderRemoveIndexList)
                 statsList.select = []
+                statsList.editing = []
+                statsList.expanding = []
+                orders.forEach((order, index) => {
+                    if(order.stats.editing) statsList.editing.push(index)
+                    if(order.stats.expanding) statsList.expanding.push(index)
+                })
             }
         },
         
@@ -165,11 +174,24 @@ export const orderSlice = createSlice({
             const prod = order.prods[prodIndex]
 
             prod.displayData[dataKey] = data
-        } 
+        },
+        copyToClipboardPostCode: ({statsList, orders}) => {
+            const data = 
+                (statsList.select.reduce((result, orderIndex) => {
+                    const order = orders[orderIndex]
+                    const selectStat = order.stats.select
+                    resetAllProdSelect(orders[orderIndex])
+                    return result + selectStat.reduce((resultOfOrder, prodIndex) => {
+                        return resultOfOrder + order.prods[prodIndex].displayData.postCode + '\n'
+                    }, '')
+                }, ''))
+            Clipboard.setString(data)
+        }
     }
 })
 
 export const {  
+    loadData,
     createOrder, 
     createProd, 
     toggleSelectProd,
@@ -181,7 +203,8 @@ export const {
     deleteSelectedItem,
     toggleComplete,
     setOrderData,
-    setProdData
+    setProdData,
+    copyToClipboardPostCode
 
 } = orderSlice.actions
 

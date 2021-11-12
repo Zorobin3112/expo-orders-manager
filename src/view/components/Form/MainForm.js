@@ -1,21 +1,38 @@
-import React, { useState } from 'react'
+import React, { useEffect, useMemo } from 'react'
+import store from '../../../redux/store'
 import { useSelector, useDispatch } from 'react-redux'
-import {  createOrder, 
+import {  loadData,
+          createOrder, 
           toggleEditingMode,
           toggleSelectAllOrder,
           toggleExpandAllOrder,
-          deleteSelectedItem } from '../../../redux/orderSlice'
+          deleteSelectedItem,
+          copyToClipboardPostCode } from '../../../redux/orderSlice'
+import { getData, storeData } from '../../../redux/storage.js'
 import styleMainForm from './styles/MainForm.style.js'
 import { FlatList, Text, ScrollView } from 'react-native'
 import { Section, Header, IconButton } from '../Core'
 import { OrderItem } from '../ListItem'
-import { i_menu, i_addList, i_edit, i_delete, i_collapseArrow, i_expandArrow, i_selectAll } from '../../assets/icon'
+import { i_menu, i_addList, i_edit, i_delete, i_collapseArrow, i_expandArrow, i_selectAll, i_copy } from '../../assets/icon'
 
 export default function MainForm() {
-  const statsList = useSelector(state => state.store.statsList)
-  console.log("Main Stat: ", statsList);
-  const orders = useSelector(state => state.store.orders)
+  const data = useSelector(state => state.store)
+  const {statsList, orders} = data
   const dispatch = useDispatch()
+  console.log("Render");
+
+  useMemo(() => {
+    getData().then(data => {
+      if(data !== null)
+        dispatch(loadData(data))
+    })
+  },[])
+
+  useEffect(() => {
+    storeData(data).then(() => {
+      console.log("Save completed");
+    })
+  }, [data])
 
   const select = statsList.select.length !== 0
   const editing = statsList.editing.length !== 0
@@ -74,6 +91,15 @@ export default function MainForm() {
               backgroundColor='rgb(245, 245, 245)'
               underlayColor='rgb(25, 118, 210)'
               onPress={() => dispatch(toggleExpandAllOrder())}
+            />
+          }
+          {!editing &&
+            <IconButton
+              id='Copy Post Code'
+              iconSource={i_copy}
+              backgroundColor='rgb(245, 245, 245)'
+              underlayColor='rgb(25, 118, 210)'
+              onPress={() => dispatch(copyToClipboardPostCode())}
             />
           }
           <IconButton

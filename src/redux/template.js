@@ -1,3 +1,4 @@
+import { getData } from './storage.js'
 import { getDateNow } from './ultility'
 
 export function createNewEmptyProd() {
@@ -34,4 +35,6 @@ export function createNewEmptyOrder() {
     }
 }
 
-
+export function createNewData() {
+    return getData().then(data => data)
+}
