@@ -1,0 +1,26 @@
+1. Tao giao dien
+    ・Main Form
+    ・Bo loc
+
+2. Logic
+o   ・Tao Order
+o   ・Tao Prod
+o   ・Select Prod
+o   ・Select Order
+o   ・Select all Order
+o   ・Expand/Collapse
+o   ・Expand/Collapse all Order
+o   ・On Edit mode for selecting Order/ Off Edit mode for editing Order
+o   ・Delete selecting Order/Prod
+o   ・Complete order
+o   ・Edit data order
+o   ・Edit data prod
+
+3. Search by
+    ・customerName
+    ・creatingDate
+    ・completeDate
+    
+    
+
+
